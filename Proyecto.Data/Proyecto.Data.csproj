@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net481</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <RootNamespace>Proyecto.Data</RootNamespace>
+    <AssemblyName>Proyecto.Data</AssemblyName>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EntityFramework" Version="6.5.2" />
+    <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.4" />
+    <PackageReference Include="Microsoft.AspNet.Identity.EntityFramework" Version="2.2.4" />
+  </ItemGroup>
+
+  <!--
+    Los proyectos SDK-style no generan automaticamente el LogicalName que las migraciones de
+    EF6 esperan para leer el snapshot del modelo embebido (el .resx generado por
+    'ef6 migrations add' no sigue la convencion de namespace-por-ruta porque el archivo tiene
+    un prefijo de timestamp). Sin esto, 'ef6 database update' falla con
+    MissingManifestResourceException.
+  -->
+  <ItemGroup>
+    <EmbeddedResource Update="Migrations\202607290326438_InitialCreate.resx">
+      <LogicalName>Proyecto.Data.Migrations.InitialCreate.resources</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>
