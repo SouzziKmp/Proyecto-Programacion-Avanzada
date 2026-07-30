@@ -1,0 +1,58 @@
+﻿@model Proyecto.Data.Entities.Orden
+
+@{
+    ViewBag.Title = "Detalle de orden";
+}
+
+<h2 class="mb-4">Orden #@Model.OrdenId</h2>
+
+<p>
+    <strong>Fecha:</strong> @Model.FechaOrden.ToString("dd/MM/yyyy hh:mm tt")
+</p>
+
+<p>
+    <strong>Total:</strong> ₡@Model.Total.ToString("N2")
+</p>
+
+@foreach (var detalle in Model.Detalles)
+{
+    <div class="card mb-3">
+        <div class="card-header">
+            @detalle.TipoEntrada.Concierto.Titulo - @detalle.TipoEntrada.Nombre
+        </div>
+
+        <div class="card-body">
+            <p>
+                <strong>Cantidad:</strong> @detalle.Cantidad
+            </p>
+
+            <p>
+                <strong>Precio unitario:</strong> ₡@detalle.PrecioUnitario.ToString("N2")
+            </p>
+
+            <h5>Tickets</h5>
+
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th>Código único</th>
+                        <th>Estado</th>
+                        <th>Fecha emisión</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ticket in detalle.Tickets)
+                    {
+                        <tr>
+                            <td>@ticket.CodigoUnico</td>
+                            <td>@ticket.Estado</td>
+                            <td>@ticket.FechaEmision.ToString("dd/MM/yyyy hh:mm tt")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@Html.ActionLink("Volver al historial", "Historial", "Ordenes", null, new { @class = "btn btn-outline-secondary" })

@@ -1,0 +1,103 @@
+﻿@using System.Linq
+@model Proyecto.Data.Entities.Concierto
+
+@{
+    ViewBag.Title = Model.Titulo;
+}
+
+<div class="row">
+    <div class="col-md-7">
+        <img src="@Url.Action("Imagen", "Cartelera", new { id = Model.ConciertoId })"
+             class="img-fluid rounded mb-3"
+             alt="@Model.Titulo"
+             style="max-height: 420px; object-fit: cover; width: 100%;" />
+    </div>
+
+    <div class="col-md-5">
+        <h2>@Model.Titulo</h2>
+
+        <p class="text-muted">
+            @Model.FechaEvento.ToString("dd/MM/yyyy hh:mm tt")
+        </p>
+
+        <p>
+            <strong>Lugar:</strong> @Model.Lugar.Nombre
+        </p>
+
+        <p>
+            <strong>Categoría:</strong> @Model.Categoria.Nombre
+        </p>
+
+        <p>
+            @Model.Descripcion
+        </p>
+
+        <hr />
+
+        <h4>Entradas disponibles</h4>
+
+        @if (!Model.TiposEntrada.Any())
+        {
+            <div class="alert alert-warning">
+                
+            </div>
+        }
+        else
+        {
+            <table class="table table-bordered align-middle">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Precio</th>
+                        <th>Disponibles</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var tipo in Model.TiposEntrada)
+                    {
+                        <tr>
+                            <td>@tipo.Nombre</td>
+                            <td>₡@tipo.Precio.ToString("N2")</td>
+                            <td>@tipo.Disponibles</td>
+                            <td>
+                                @if (tipo.Disponibles > 0)
+                                {
+                                    using (Html.BeginForm("Agregar", "Carrito", FormMethod.Post))
+                                    {
+                                        @Html.AntiForgeryToken()
+
+                                        @Html.Hidden("tipoEntradaId", tipo.TipoEntradaId)
+
+                                        <div class="input-group input-group-sm">
+                                            <input type="number"
+                                                   name="cantidad"
+                                                   value="1"
+                                                   min="1"
+                                                   max="@tipo.Disponibles"
+                                                   class="form-control" />
+
+                                            <button type="submit" class="btn btn-primary">
+                                                Agregar
+                                            </button>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Agotado</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="alert alert-info">
+               
+            </div>
+        }
+
+        @Html.ActionLink("Volver a cartelera", "Index", "Cartelera", null, new { @class = "btn btn-outline-secondary" })
+    </div>
+</div>

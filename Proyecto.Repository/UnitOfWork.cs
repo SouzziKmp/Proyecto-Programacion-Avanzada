@@ -29,6 +29,11 @@ namespace Proyecto.Repository
             return (IRepository<TEntity>)_repositories[type];
         }
 
+        public System.Data.Entity.DbContextTransaction BeginTransaction()
+        {
+            return _context.Database.BeginTransaction();
+        }
+
         public int SaveChanges() => _context.SaveChanges();
 
         public void Dispose()
