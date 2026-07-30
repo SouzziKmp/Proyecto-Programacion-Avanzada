@@ -18,7 +18,7 @@ namespace Proyecto.Data.Migrations
         {
 
             var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context));
-            foreach (var nombreRol in new[] { "Administrador", "Asociado" })
+            foreach (var nombreRol in new[] { "Administrador", "Asociado"  })
             {
                 if (!roleManager.RoleExists(nombreRol))
                     roleManager.Create(new IdentityRole(nombreRol));
