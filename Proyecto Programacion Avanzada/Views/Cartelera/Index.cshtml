@@ -1,0 +1,66 @@
+﻿@model IEnumerable<Proyecto.Data.Entities.Concierto>
+
+@{
+    ViewBag.Title = "Cartelera";
+}
+
+<h2 class="mb-4">Cartelera de conciertos</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        No hay conciertos disponibles en este momento.
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var concierto in Model)
+        {
+            var precioDesde = concierto.TiposEntrada.Any()
+                ? concierto.TiposEntrada.Min(t => t.Precio)
+                : 0;
+
+            var disponibles = concierto.TiposEntrada.Sum(t => t.Disponibles);
+
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <img src="@Url.Action("Imagen", "Cartelera", new { id = concierto.ConciertoId })"
+                         class="card-img-top"
+                         alt="@concierto.Titulo"
+                         style="height: 220px; object-fit: cover;" />
+
+                    <div class="card-body">
+                        <h5 class="card-title">@concierto.Titulo</h5>
+
+                        <p class="card-text text-muted mb-1">
+                            @concierto.FechaEvento.ToString("dd/MM/yyyy hh:mm tt")
+                        </p>
+
+                        <p class="card-text mb-1">
+                            @concierto.Lugar.Nombre
+                        </p>
+
+                        <p class="card-text">
+                            <strong>Desde:</strong> ₡@precioDesde.ToString("N2")
+                        </p>
+
+                        <p class="card-text">
+                            <strong>Disponibles:</strong> @disponibles
+                        </p>
+                    </div>
+
+                    <div class="card-footer bg-white">
+                        @Html.ActionLink(
+                            "Ver detalle",
+                            "Details",
+                            "Cartelera",
+                            new { id = concierto.ConciertoId },
+                            new { @class = "btn btn-primary w-100" }
+                        )
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

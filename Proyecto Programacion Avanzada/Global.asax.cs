@@ -13,6 +13,10 @@ namespace Proyecto_Programacion_Avanzada
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
+<<<<<<< HEAD
+=======
+            UnityConfig.RegisterComponents();
+>>>>>>> e2f3b01558ed925e2221b1ceb0a64ba3b01104e0
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);

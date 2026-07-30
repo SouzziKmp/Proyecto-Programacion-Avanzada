@@ -1,0 +1,42 @@
+﻿@model IEnumerable<Proyecto.Data.Entities.Orden>
+
+@{
+    ViewBag.Title = "Historial de compras";
+}
+
+<h2 class="mb-4">Historial de compras</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        No hay compras registradas.
+    </div>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Orden</th>
+                <th>Fecha</th>
+                <th>Total</th>
+                <th>Estado</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var orden in Model)
+            {
+                <tr>
+                    <td>#@orden.OrdenId</td>
+                    <td>@orden.FechaOrden.ToString("dd/MM/yyyy hh:mm tt")</td>
+                    <td>₡@orden.Total.ToString("N2")</td>
+                    <td>@orden.Estado</td>
+                    <td>
+                        @Html.ActionLink("Ver tickets", "Details", "Ordenes", new { id = orden.OrdenId }, new { @class = "btn btn-primary btn-sm" })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

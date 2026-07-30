@@ -1,0 +1,98 @@
+﻿@using System.Linq
+@model Proyecto.Data.Entities.Carrito
+
+@{
+    ViewBag.Title = "Carrito";
+    var detalles = Model == null ? Enumerable.Empty<Proyecto.Data.Entities.CarritoDetalle>() : Model.Detalles;
+    var total = detalles.Sum(d => d.Cantidad * d.PrecioUnitario);
+}
+
+<h2 class="mb-4">Carrito de compras</h2>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (!detalles.Any())
+{
+    <div class="alert alert-info">
+        El carrito está vacío.
+    </div>
+
+    @Html.ActionLink("Volver a cartelera", "Index", "Cartelera", null, new { @class = "btn btn-primary" })
+}
+else
+{
+    <table class="table table-bordered align-middle">
+        <thead>
+            <tr>
+                <th>Concierto</th>
+                <th>Entrada</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+                <th>Subtotal</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in detalles)
+            {
+                <tr>
+                    <td>@item.TipoEntrada.Concierto.Titulo</td>
+                    <td>@item.TipoEntrada.Nombre</td>
+                    <td>₡@item.PrecioUnitario.ToString("N2")</td>
+                    <td>
+                        @using (Html.BeginForm("Actualizar", "Carrito", FormMethod.Post))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.Hidden("carritoDetalleId", item.CarritoDetalleId)
+
+                            <div class="input-group input-group-sm">
+                                <input type="number"
+                                       name="cantidad"
+                                       value="@item.Cantidad"
+                                       min="1"
+                                       class="form-control" />
+
+                                <button type="submit" class="btn btn-outline-primary">
+                                    Actualizar
+                                </button>
+                            </div>
+                        }
+                    </td>
+                    <td>₡@((item.Cantidad * item.PrecioUnitario).ToString("N2"))</td>
+                    <td>
+                        @using (Html.BeginForm("Eliminar", "Carrito", FormMethod.Post))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.Hidden("carritoDetalleId", item.CarritoDetalleId)
+
+                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                Eliminar
+                            </button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="text-end">
+        <h4>Total: ₡@total.ToString("N2")</h4>
+
+        @using (Html.BeginForm("Comprar", "Carrito", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+
+            <button type="submit" class="btn btn-success">
+                Confirmar compra
+            </button>
+        }
+    </div>
+}
