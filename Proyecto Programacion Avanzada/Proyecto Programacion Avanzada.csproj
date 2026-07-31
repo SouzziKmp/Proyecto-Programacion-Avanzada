@@ -151,7 +151,9 @@
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="Controllers\CarritoController.cs" />
     <Compile Include="Controllers\CarteleraController.cs" />
+    <Compile Include="Controllers\ConciertosController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\ImagenController.cs" />
     <Compile Include="Controllers\OrdenesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -214,6 +216,11 @@
     <Content Include="Views\Carrito\Index.cshtml" />
     <Content Include="Views\Ordenes\Historial.cshtml" />
     <Content Include="Views\Ordenes\Details.cshtml" />
+    <Content Include="Views\conciertos\Create.cshtml" />
+    <Content Include="Views\conciertos\Delete.cshtml" />
+    <Content Include="Views\conciertos\Details.cshtml" />
+    <Content Include="Views\conciertos\Edit.cshtml" />
+    <Content Include="Views\conciertos\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
