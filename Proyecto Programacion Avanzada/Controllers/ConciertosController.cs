@@ -3,6 +3,7 @@ using Proyecto.Service.Services;
 using System.IO;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Mvc;
 
 namespace Proyecto_Programacion_Avanzada.Controllers
 {
@@ -19,20 +20,21 @@ namespace Proyecto_Programacion_Avanzada.Controllers
             _lugarService = new LugarService();
         }
 
-        
-        // INDEX
-        
 
+        // INDEX
+
+
+        [AllowAnonymous]
         public ActionResult Index()
         {
             var lista = _service.ObtenerTodos();
             return View(lista);
         }
 
-        
-        // DETAILS
-        
 
+        // DETAILS
+
+        [AllowAnonymous]
         public ActionResult Details(int id)
         {
             var concierto = _service.ObtenerPorId(id);
@@ -43,32 +45,38 @@ namespace Proyecto_Programacion_Avanzada.Controllers
             return View(concierto);
         }
 
-        
-        // CREATE GET
-        
 
+        // CREATE GET
+
+
+        [Authorize(Roles = "Administrador")]
         public ActionResult Create()
         {
             ViewBag.Categorias = new SelectList(
                 _categoriaService.ObtenerTodas(),
                 "CategoriaId",
-                "Nombre");
+                "Nombre"
+            );
 
             ViewBag.Lugares = new SelectList(
                 _lugarService.ObtenerTodos(),
                 "LugarId",
-                "Nombre");
+                "Nombre"
+            );
 
             return View();
         }
 
-        
+
         // CREATE POST
-    
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Concierto concierto, HttpPostedFileBase imagen)
+        [Authorize(Roles = "Administrador")]
+        public ActionResult Create(
+            Concierto concierto,
+            HttpPostedFileBase imagen)
         {
             if (ModelState.IsValid)
             {
@@ -76,22 +84,34 @@ namespace Proyecto_Programacion_Avanzada.Controllers
                 string nombreArchivo = null;
                 string tipoContenido = null;
 
-                if (imagen != null && imagen.ContentLength > 0)
+                if (imagen != null &&
+                    imagen.ContentLength > 0)
                 {
-                    using (BinaryReader br = new BinaryReader(imagen.InputStream))
+                    using (var br =
+                        new System.IO.BinaryReader(
+                            imagen.InputStream))
                     {
-                        contenido = br.ReadBytes(imagen.ContentLength);
+                        contenido =
+                            br.ReadBytes(
+                                imagen.ContentLength
+                            );
                     }
 
-                    nombreArchivo = Path.GetFileName(imagen.FileName);
-                    tipoContenido = imagen.ContentType;
+                    nombreArchivo =
+                        System.IO.Path.GetFileName(
+                            imagen.FileName
+                        );
+
+                    tipoContenido =
+                        imagen.ContentType;
                 }
 
                 _service.Agregar(
                     concierto,
                     contenido,
                     nombreArchivo,
-                    tipoContenido);
+                    tipoContenido
+                );
 
                 return RedirectToAction("Index");
             }
@@ -100,20 +120,23 @@ namespace Proyecto_Programacion_Avanzada.Controllers
                 _categoriaService.ObtenerTodas(),
                 "CategoriaId",
                 "Nombre",
-                concierto.CategoriaId);
+                concierto.CategoriaId
+            );
 
             ViewBag.Lugares = new SelectList(
                 _lugarService.ObtenerTodos(),
                 "LugarId",
                 "Nombre",
-                concierto.LugarId);
+                concierto.LugarId
+            );
 
             return View(concierto);
         }
 
         // EDIT GET
-      
 
+
+        [Authorize(Roles = "Administrador")]
         public ActionResult Edit(int id)
         {
             var concierto = _service.ObtenerPorId(id);
@@ -125,24 +148,29 @@ namespace Proyecto_Programacion_Avanzada.Controllers
                 _categoriaService.ObtenerTodas(),
                 "CategoriaId",
                 "Nombre",
-                concierto.CategoriaId);
+                concierto.CategoriaId
+            );
 
             ViewBag.Lugares = new SelectList(
                 _lugarService.ObtenerTodos(),
                 "LugarId",
                 "Nombre",
-                concierto.LugarId);
+                concierto.LugarId
+            );
 
             return View(concierto);
         }
 
-        
+
         // EDIT POST
-        
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Concierto concierto, HttpPostedFileBase imagen)
+        [Authorize(Roles = "Administrador")]
+        public ActionResult Edit(
+    Concierto concierto,
+    HttpPostedFileBase imagen)
         {
             if (ModelState.IsValid)
             {
@@ -150,22 +178,34 @@ namespace Proyecto_Programacion_Avanzada.Controllers
                 string nombreArchivo = null;
                 string tipoContenido = null;
 
-                if (imagen != null && imagen.ContentLength > 0)
+                if (imagen != null &&
+                    imagen.ContentLength > 0)
                 {
-                    using (BinaryReader br = new BinaryReader(imagen.InputStream))
+                    using (var br =
+                        new System.IO.BinaryReader(
+                            imagen.InputStream))
                     {
-                        contenido = br.ReadBytes(imagen.ContentLength);
+                        contenido =
+                            br.ReadBytes(
+                                imagen.ContentLength
+                            );
                     }
 
-                    nombreArchivo = Path.GetFileName(imagen.FileName);
-                    tipoContenido = imagen.ContentType;
+                    nombreArchivo =
+                        System.IO.Path.GetFileName(
+                            imagen.FileName
+                        );
+
+                    tipoContenido =
+                        imagen.ContentType;
                 }
 
                 _service.Actualizar(
                     concierto,
                     contenido,
                     nombreArchivo,
-                    tipoContenido);
+                    tipoContenido
+                );
 
                 return RedirectToAction("Index");
             }
@@ -174,21 +214,24 @@ namespace Proyecto_Programacion_Avanzada.Controllers
                 _categoriaService.ObtenerTodas(),
                 "CategoriaId",
                 "Nombre",
-                concierto.CategoriaId);
+                concierto.CategoriaId
+            );
 
             ViewBag.Lugares = new SelectList(
                 _lugarService.ObtenerTodos(),
                 "LugarId",
                 "Nombre",
-                concierto.LugarId);
+                concierto.LugarId
+            );
 
             return View(concierto);
         }
 
-      
-        // DELETE GET
-        
 
+        // DELETE GET
+
+
+        [Authorize(Roles = "Administrador")]
         public ActionResult Delete(int id)
         {
             var concierto = _service.ObtenerPorId(id);
@@ -199,16 +242,18 @@ namespace Proyecto_Programacion_Avanzada.Controllers
             return View(concierto);
         }
 
-        
+
         // DELETE POST
-        
+
 
         [HttpPost]
         [ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public ActionResult DeleteConfirmed(int id)
         {
             _service.Eliminar(id);
+
             return RedirectToAction("Index");
         }
     }

@@ -1,0 +1,46 @@
+﻿@model Proyecto.Data.Entities.ApplicationUser
+
+@{
+    ViewBag.Title = "Desactivar usuario";
+}
+
+<h2>Desactivar usuario</h2>
+
+<div class="alert alert-warning">
+    ¿Está seguro de que desea desactivar este usuario?
+</div>
+
+<dl class="row">
+    <dt class="col-sm-3">
+        Nombre
+    </dt>
+
+    <dd class="col-sm-9">
+        @Model.Nombre @Model.Apellidos
+    </dd>
+
+    <dt class="col-sm-3">
+        Correo
+    </dt>
+
+    <dd class="col-sm-9">
+        @Model.Email
+    </dd>
+</dl>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <button type="submit"
+            class="btn btn-danger">
+        Desactivar
+    </button>
+
+    @Html.ActionLink(
+        "Cancelar",
+        "Index",
+        null,
+        new { @class = "btn btn-secondary" }
+    )
+}

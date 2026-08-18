@@ -1,52 +1,43 @@
 ﻿using System;
-using System.Configuration;
-using System.Data.SqlClient;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Proyecto.Service;
 
 namespace Proyecto_Programacion_Avanzada.Controllers
 {
+    [Authorize]
     public class OrdenesController : Controller
     {
         private readonly IOrdenService _ordenService;
 
-        public OrdenesController(IOrdenService ordenService)
+        public OrdenesController(
+            IOrdenService ordenService)
         {
             _ordenService = ordenService;
         }
 
         private string ObtenerUsuarioId()
         {
-            var usuarioId = User.Identity.GetUserId();
+            if (!User.Identity.IsAuthenticated)
+                throw new UnauthorizedAccessException();
 
-            if (!string.IsNullOrWhiteSpace(usuarioId))
-                return usuarioId;
+            var usuarioId =
+                User.Identity.GetUserId();
 
-            var connectionString = ConfigurationManager
-                .ConnectionStrings["ProyectoFinalDb"]
-                .ConnectionString;
+            if (string.IsNullOrWhiteSpace(usuarioId))
+                throw new UnauthorizedAccessException();
 
-            using (var connection = new SqlConnection(connectionString))
-            using (var command = new SqlCommand("SELECT Id FROM AspNetUsers WHERE Email = @Email", connection))
-            {
-                command.Parameters.AddWithValue("@Email", "socio@proyectofinal.com");
-
-                connection.Open();
-
-                var result = command.ExecuteScalar();
-
-                if (result == null)
-                    throw new InvalidOperationException("No existe el usuario socio@proyectofinal.com. Ejecute las migraciones/seed primero.");
-
-                return result.ToString();
-            }
+            return usuarioId;
         }
 
         public ActionResult Historial()
         {
             var usuarioId = ObtenerUsuarioId();
-            var ordenes = _ordenService.ObtenerHistorial(usuarioId);
+
+            var ordenes =
+                _ordenService.ObtenerHistorial(
+                    usuarioId
+                );
 
             return View(ordenes);
         }
@@ -57,7 +48,12 @@ namespace Proyecto_Programacion_Avanzada.Controllers
                 return RedirectToAction("Historial");
 
             var usuarioId = ObtenerUsuarioId();
-            var orden = _ordenService.ObtenerDetalle(usuarioId, id.Value);
+
+            var orden =
+                _ordenService.ObtenerDetalle(
+                    usuarioId,
+                    id.Value
+                );
 
             if (orden == null)
                 return HttpNotFound();

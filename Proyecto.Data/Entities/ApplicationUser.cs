@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace Proyecto.Data.Entities
@@ -27,8 +30,25 @@ namespace Proyecto.Data.Entities
 
         public bool Activo { get; set; } = true;
 
-        public virtual ICollection<Carrito> Carritos { get; set; } = new List<Carrito>();
-        public virtual ICollection<Orden> Ordenes { get; set; } = new List<Orden>();
-        public virtual ICollection<Resena> Resenas { get; set; } = new List<Resena>();
+        public virtual ICollection<Carrito> Carritos { get; set; }
+            = new List<Carrito>();
+
+        public virtual ICollection<Orden> Ordenes { get; set; }
+            = new List<Orden>();
+
+        public virtual ICollection<Resena> Resenas { get; set; }
+            = new List<Resena>();
+
+        public async Task<ClaimsIdentity> GenerateUserIdentityAsync(
+            UserManager<ApplicationUser> manager)
+        {
+            var userIdentity =
+                await manager.CreateIdentityAsync(
+                    this,
+                    DefaultAuthenticationTypes.ApplicationCookie
+                );
+
+            return userIdentity;
+        }
     }
 }
