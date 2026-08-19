@@ -11,11 +11,16 @@
     <hr />
     <div class="text-center" style="margin-bottom:25px;">
 
-        <img src="@Url.Action("Concierto", "Imagen", new { id = Model.ConciertoId })"
-             style="max-width:400px;
-                max-height:300px;
-                border-radius:8px;
-                border:1px solid #ccc;" />
+        @foreach (var imagen in Model.Imagenes.OrderBy(i => i.Orden))
+        {
+            <img src="@Url.Action("Concierto", "Imagen",
+                    new { id = Model.ConciertoId, orden = imagen.Orden })"
+                 style="max-width:400px;
+                    max-height:300px;
+                    margin:10px;
+                    border-radius:8px;
+                    border:1px solid #ccc;" />
+        }
 
     </div>
     <dl class="dl-horizontal">

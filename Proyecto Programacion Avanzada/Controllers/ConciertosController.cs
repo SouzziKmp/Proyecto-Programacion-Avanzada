@@ -3,7 +3,7 @@ using Proyecto.Service.Services;
 using System.IO;
 using System.Web;
 using System.Web.Mvc;
-using System.Web.Mvc;
+using System.Collections.Generic;
 
 namespace Proyecto_Programacion_Avanzada.Controllers
 {
@@ -13,11 +13,13 @@ namespace Proyecto_Programacion_Avanzada.Controllers
         private readonly CategoriaService _categoriaService;
         private readonly LugarService _lugarService;
 
-        public ConciertosController()
+        public ConciertosController(ConciertoService service,
+                                    CategoriaService categoriaService,
+                                    LugarService lugarService)
         {
-            _service = new ConciertoService();
-            _categoriaService = new CategoriaService();
-            _lugarService = new LugarService();
+                                    _service = service;
+                                    _categoriaService = categoriaService;
+                                    _lugarService = lugarService;
         }
 
 
@@ -76,44 +78,51 @@ namespace Proyecto_Programacion_Avanzada.Controllers
         [Authorize(Roles = "Administrador")]
         public ActionResult Create(
             Concierto concierto,
-            HttpPostedFileBase imagen)
+            IEnumerable<HttpPostedFileBase> archivos)
         {
             if (ModelState.IsValid)
             {
-                byte[] contenido = null;
-                string nombreArchivo = null;
-                string tipoContenido = null;
+                var listaImagenes = new List<ConciertoImagen>();
 
-                if (imagen != null &&
-                    imagen.ContentLength > 0)
+                if (archivos != null)
                 {
-                    using (var br =
-                        new System.IO.BinaryReader(
-                            imagen.InputStream))
+                    foreach (var imagen in archivos)
                     {
-                        contenido =
-                            br.ReadBytes(
-                                imagen.ContentLength
-                            );
+                        if (imagen != null && imagen.ContentLength > 0)
+                        {
+                            using (var br = new BinaryReader(imagen.InputStream))
+                            {
+                                listaImagenes.Add(new ConciertoImagen
+                                {
+                                    NombreArchivo = Path.GetFileName(imagen.FileName),
+                                    TipoContenido = imagen.ContentType,
+                                    Contenido = br.ReadBytes(imagen.ContentLength)
+                                });
+                            }
+                        }
                     }
-
-                    nombreArchivo =
-                        System.IO.Path.GetFileName(
-                            imagen.FileName
-                        );
-
-                    tipoContenido =
-                        imagen.ContentType;
                 }
 
-                _service.Agregar(
-                    concierto,
-                    contenido,
-                    nombreArchivo,
-                    tipoContenido
-                );
+                if (listaImagenes.Count > 3)
+                {
+                    ModelState.AddModelError(
+                        "",
+                        "Solo se permiten un máximo de 3 imágenes."
+                    );
+                }
+                else
+                {
+                    _service.Agregar(concierto, listaImagenes);
 
-                return RedirectToAction("Index");
+                    return RedirectToAction("Index");
+                }
+
+
+
+            
+
+
+
             }
 
             ViewBag.Categorias = new SelectList(
@@ -169,45 +178,49 @@ namespace Proyecto_Programacion_Avanzada.Controllers
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrador")]
         public ActionResult Edit(
-    Concierto concierto,
-    HttpPostedFileBase imagen)
+            Concierto concierto,
+            IEnumerable<HttpPostedFileBase> archivos)
         {
             if (ModelState.IsValid)
             {
-                byte[] contenido = null;
-                string nombreArchivo = null;
-                string tipoContenido = null;
+                var listaImagenes = new List<ConciertoImagen>();
 
-                if (imagen != null &&
-                    imagen.ContentLength > 0)
+                if (archivos != null)
                 {
-                    using (var br =
-                        new System.IO.BinaryReader(
-                            imagen.InputStream))
+                    foreach (var imagen in archivos)
                     {
-                        contenido =
-                            br.ReadBytes(
-                                imagen.ContentLength
-                            );
+                        if (imagen != null && imagen.ContentLength > 0)
+                        {
+                            using (var br = new BinaryReader(imagen.InputStream))
+                            {
+                                listaImagenes.Add(new ConciertoImagen
+                                {
+                                    NombreArchivo = Path.GetFileName(imagen.FileName),
+                                    TipoContenido = imagen.ContentType,
+                                    Contenido = br.ReadBytes(imagen.ContentLength)
+                                });
+                            }
+                        }
                     }
-
-                    nombreArchivo =
-                        System.IO.Path.GetFileName(
-                            imagen.FileName
-                        );
-
-                    tipoContenido =
-                        imagen.ContentType;
                 }
 
-                _service.Actualizar(
-                    concierto,
-                    contenido,
-                    nombreArchivo,
-                    tipoContenido
-                );
+                if (listaImagenes.Count > 3)
+                {
+                    ModelState.AddModelError(
+                        "",
+                        "Solo se permiten un máximo de 3 imágenes."
+                    );
+                }
+                else
+                {
+                    _service.Actualizar(concierto, listaImagenes);
 
-                return RedirectToAction("Index");
+                    return RedirectToAction("Index");
+                }
+
+
+
+
             }
 
             ViewBag.Categorias = new SelectList(

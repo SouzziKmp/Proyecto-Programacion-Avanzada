@@ -9,7 +9,7 @@ namespace Proyecto.Service.Services
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public CategoriaService()
+        public CategoriaService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = new UnitOfWork();
         }

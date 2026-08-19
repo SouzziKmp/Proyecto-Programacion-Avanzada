@@ -9,7 +9,7 @@ namespace Proyecto.Service.Services
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public LugarService()
+        public LugarService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = new UnitOfWork();
         }

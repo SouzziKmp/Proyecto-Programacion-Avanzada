@@ -2,6 +2,7 @@
 using Proyecto.Repository;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Proyecto.Service.Services
 {
@@ -9,9 +10,9 @@ namespace Proyecto.Service.Services
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public ConciertoService()
+        public ConciertoService(IUnitOfWork unitOfWork)
         {
-            _unitOfWork = new UnitOfWork();
+            _unitOfWork = unitOfWork;
         }
 
         public List<Concierto> ObtenerTodos()
@@ -27,64 +28,83 @@ namespace Proyecto.Service.Services
                               .GetById(id);
         }
 
-        public void Agregar(Concierto concierto, byte[] contenido, string nombreArchivo, string tipoContenido)
+        public void Agregar(
+            Concierto concierto,
+            List<ConciertoImagen> imagenes)
         {
             _unitOfWork.Repository<Concierto>().Add(concierto);
             _unitOfWork.SaveChanges();
 
-            if (contenido != null && contenido.Length > 0)
+            if (imagenes != null && imagenes.Count > 0)
             {
-                ConciertoImagen imagen = new ConciertoImagen
-                {
-                    ConciertoId = concierto.ConciertoId,
-                    NombreArchivo = nombreArchivo,
-                    TipoContenido = tipoContenido,
-                    Contenido = contenido,
-                    EsPrincipal = true,
-                    Orden = 1,
-                    FechaCarga = System.DateTime.Now
-                };
+                int orden = 1;
 
-                _unitOfWork.Repository<ConciertoImagen>().Add(imagen);
+                foreach (var imagen in imagenes)
+                {
+                    if (orden > 3)
+                        break;
+
+                    imagen.ConciertoId = concierto.ConciertoId;
+                    imagen.Orden = orden;
+                    imagen.EsPrincipal = orden == 1;
+                    imagen.FechaCarga = DateTime.Now;
+
+                    _unitOfWork.Repository<ConciertoImagen>().Add(imagen);
+
+                    orden++;
+                }
+
                 _unitOfWork.SaveChanges();
             }
         }
 
         public void Actualizar(
             Concierto concierto,
-            byte[] contenido,
-            string nombreArchivo,
-            string tipoContenido)
+            List<ConciertoImagen> imagenes)
         {
             _unitOfWork.Repository<Concierto>().Update(concierto);
             _unitOfWork.SaveChanges();
 
-            if (contenido != null && contenido.Length > 0)
+            // Si no se cargaron nuevas imágenes,
+            // se conservan las imágenes existentes.
+            if (imagenes == null || imagenes.Count == 0)
+                return;
+
+            var imagenesActuales = _unitOfWork
+                .Repository<ConciertoImagen>()
+                .Query()
+                .Where(i => i.ConciertoId == concierto.ConciertoId)
+                .ToList();
+
+            foreach (var imagenActual in imagenesActuales)
             {
-                var imagen = _unitOfWork
-                    .Repository<ConciertoImagen>()
-                    .Query()
-                    .FirstOrDefault(i => i.ConciertoId == concierto.ConciertoId);
-
-                if (imagen == null)
-                {
-                    imagen = new ConciertoImagen
-                    {
-                        ConciertoId = concierto.ConciertoId,
-                        FechaCarga = System.DateTime.Now,
-                        EsPrincipal = true,
-                        Orden = 1
-                    };
-
-                    _unitOfWork.Repository<ConciertoImagen>().Add(imagen);
-                }
-
-                imagen.NombreArchivo = nombreArchivo;
-                imagen.TipoContenido = tipoContenido;
-                imagen.Contenido = contenido;
-
-                _unitOfWork.SaveChanges();
+                _unitOfWork.Repository<ConciertoImagen>()
+                    .Remove(imagenActual);
             }
+
+            _unitOfWork.SaveChanges();
+
+            int orden = 1;
+
+            foreach (var imagen in imagenes)
+            {
+                if (orden > 3)
+                    break;
+
+                imagen.ConciertoId = concierto.ConciertoId;
+                imagen.Orden = orden;
+                imagen.EsPrincipal = orden == 1;
+                imagen.FechaCarga = DateTime.Now;
+
+                _unitOfWork.Repository<ConciertoImagen>().Add(imagen);
+
+                orden++;
+            }
+
+
+
+            _unitOfWork.SaveChanges();
+
         }
 
         public void Eliminar(int id)
