@@ -1,0 +1,44 @@
+﻿@model Proyecto.Data.Entities.Concierto
+
+@{
+    ViewBag.Title = "Eliminar Concierto";
+}
+
+<h2>Eliminar Concierto</h2>
+
+<h3>¿Está seguro de que desea eliminar este concierto?</h3>
+
+<div>
+
+    <hr />
+
+    <dl class="dl-horizontal">
+
+        <dt>Título</dt>
+        <dd>@Model.Titulo</dd>
+
+        <dt>Descripción</dt>
+        <dd>@Model.Descripcion</dd>
+
+        <dt>Fecha</dt>
+        <dd>@Model.FechaEvento.ToString("dd/MM/yyyy HH:mm")</dd>
+
+        <dt>Estado</dt>
+        <dd>@(Model.Estado == 1 ? "Activo" : "Inactivo")</dd>
+
+    </dl>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        @Html.HiddenFor(model => model.ConciertoId)
+
+        <button type="submit" class="btn btn-danger">
+            Eliminar
+        </button>
+
+        @Html.ActionLink("Cancelar", "Index", null, new { @class = "btn btn-secondary" })
+    }
+
+</div>

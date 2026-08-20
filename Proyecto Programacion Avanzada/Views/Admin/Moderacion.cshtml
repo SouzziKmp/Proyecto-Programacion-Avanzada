@@ -1,0 +1,100 @@
+﻿@{
+    ViewBag.Title = "Moderación de reseñas";
+}
+
+<h2 class="mb-4">Moderación de reseñas</h2>
+
+<div id="moderacion-error" class="alert alert-danger d-none"></div>
+<div id="moderacion-vacio" class="alert alert-info d-none">No hay reseñas pendientes.</div>
+
+<table class="table table-bordered align-middle">
+    <thead>
+        <tr>
+            <th>Concierto</th>
+            <th>Usuario</th>
+            <th>Calificación</th>
+            <th>Comentario</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody id="cuerpo-resenas"></tbody>
+</table>
+
+@section scripts {
+    <script>
+        function cargarResenas() {
+            fetch("/api/resenas/pendientes", { method: "GET", credentials: "same-origin" })
+                .then(function (respuesta) {
+                    if (!respuesta.ok) throw new Error("No se pudieron cargar las reseñas.");
+                    return respuesta.json();
+                })
+                .then(function (resenas) {
+                    var cuerpo = document.getElementById("cuerpo-resenas");
+                    cuerpo.innerHTML = "";
+
+                    var vacio = document.getElementById("moderacion-vacio");
+                    if (resenas.length === 0) {
+                        vacio.classList.remove("d-none");
+                        return;
+                    }
+                    vacio.classList.add("d-none");
+
+                    resenas.forEach(function (r) {
+                        var fila = document.createElement("tr");
+                        fila.id = "resena-" + r.ResenaId;
+
+                        var tdConcierto = document.createElement("td");
+                        tdConcierto.textContent = r.Concierto;
+
+                        var tdUsuario = document.createElement("td");
+                        tdUsuario.textContent = r.Usuario;
+
+                        var tdCalificacion = document.createElement("td");
+                        tdCalificacion.textContent = r.Calificacion + " / 5";
+
+                        var tdComentario = document.createElement("td");
+                        tdComentario.textContent = r.Comentario;
+
+                        var tdAcciones = document.createElement("td");
+                        tdAcciones.innerHTML =
+                            "<button class=\"btn btn-success btn-sm me-1\" onclick=\"moderar(" + r.ResenaId + ", true)\">Aprobar</button>" +
+                            "<button class=\"btn btn-danger btn-sm\" onclick=\"moderar(" + r.ResenaId + ", false)\">Rechazar</button>";
+
+                        fila.appendChild(tdConcierto);
+                        fila.appendChild(tdUsuario);
+                        fila.appendChild(tdCalificacion);
+                        fila.appendChild(tdComentario);
+                        fila.appendChild(tdAcciones);
+
+                        cuerpo.appendChild(fila);
+                    });
+                })
+                .catch(function (error) {
+                    var caja = document.getElementById("moderacion-error");
+                    caja.textContent = error.message;
+                    caja.classList.remove("d-none");
+                });
+        }
+
+        function moderar(id, aprobar) {
+            fetch("/api/resenas/" + id + "/moderar", {
+                method: "PUT",
+                credentials: "same-origin",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ Aprobar: aprobar })
+            })
+                .then(function (respuesta) {
+                    if (!respuesta.ok) throw new Error("No se pudo moderar la reseña.");
+                    var fila = document.getElementById("resena-" + id);
+                    if (fila) fila.remove();
+                })
+                .catch(function (error) {
+                    var caja = document.getElementById("moderacion-error");
+                    caja.textContent = error.message;
+                    caja.classList.remove("d-none");
+                });
+        }
+
+        document.addEventListener("DOMContentLoaded", cargarResenas);
+    </script>
+}

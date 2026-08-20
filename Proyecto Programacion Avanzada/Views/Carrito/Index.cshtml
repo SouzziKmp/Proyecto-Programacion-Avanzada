@@ -86,13 +86,44 @@ else
     <div class="text-end">
         <h4>Total: ₡@total.ToString("N2")</h4>
 
-        @using (Html.BeginForm("Comprar", "Carrito", FormMethod.Post))
-        {
-            @Html.AntiForgeryToken()
+        <div id="compra-mensaje" class="alert d-none"></div>
 
-            <button type="submit" class="btn btn-success">
-                Confirmar compra
-            </button>
-        }
+        <button type="button" class="btn btn-success" onclick="confirmarCompra()">
+            Confirmar compra
+        </button>
     </div>
+}
+@section scripts {
+    <script>
+        function confirmarCompra() {
+            fetch("/api/entradas/comprar", { method: "POST", credentials: "same-origin" })
+                .then(function (respuesta) {
+                    return respuesta.json().then(function (datos) {
+                        return { ok: respuesta.ok, datos: datos };
+                    });
+                })
+                .then(function (resultado) {
+                    var caja = document.getElementById("compra-mensaje");
+                    caja.classList.remove("d-none", "alert-success", "alert-danger");
+
+                    if (resultado.ok) {
+                        caja.classList.add("alert-success");
+                        caja.textContent = resultado.datos.Mensaje || "Compra realizada correctamente.";
+
+                        setTimeout(function () {
+                            window.location.href = "/Ordenes/Details/" + resultado.datos.OrdenId;
+                        }, 1200);
+                    } else {
+                        caja.classList.add("alert-danger");
+                        caja.textContent = resultado.datos || "No se pudo completar la compra.";
+                    }
+                })
+                .catch(function () {
+                    var caja = document.getElementById("compra-mensaje");
+                    caja.classList.remove("d-none");
+                    caja.classList.add("alert-danger");
+                    caja.textContent = "Ocurrió un error al conectar con el servidor.";
+                });
+        }
+    </script>
 }

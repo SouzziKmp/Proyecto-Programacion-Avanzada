@@ -16,17 +16,6 @@ namespace Proyecto.Data.Migrations
 
         protected override void Seed(ApplicationDbContext context)
         {
-<<<<<<< HEAD
-
-            var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context));
-            foreach (var nombreRol in new[] { "Administrador", "Asociado"  })
-            {
-                if (!roleManager.RoleExists(nombreRol))
-                    roleManager.Create(new IdentityRole(nombreRol));
-            }
-
-=======
->>>>>>> e2f3b01558ed925e2221b1ceb0a64ba3b01104e0
             SeedRolesYUsuarios(context, out string adminId, out string socioId);
             SeedCatalogo(context, socioId);
         }

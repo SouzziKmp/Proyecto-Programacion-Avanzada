@@ -1,0 +1,78 @@
+﻿@model IEnumerable<Proyecto.Data.Entities.Concierto>
+
+@{
+    ViewBag.Title = "Administración de Conciertos";
+}
+
+<h2>Administración de Conciertos</h2>
+
+<p>
+    @Html.ActionLink("Nuevo Concierto", "Create", null, new { @class = "btn btn-success" })
+</p>
+
+<table class="table table-bordered table-hover">
+
+    <thead>
+        <tr>
+            <th>Imagen</th>
+            <th>Título</th>
+            <th>Fecha</th>
+            <th>Categoría</th>
+            <th>Lugar</th>
+            <th>Estado</th>
+            <th width="220">Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td style="width:110px">
+
+                    <img src="@Url.Action("Concierto", "Imagen", new { id = item.ConciertoId })"
+                         width="90"
+                         height="90"
+                         style="object-fit:cover;border-radius:6px;" />
+
+                </td>
+
+                <td>@item.Titulo</td>
+
+                <td>
+                    @item.FechaEvento.ToString("dd/MM/yyyy HH:mm")
+                </td>
+
+                <td>
+                    @(item.Categoria != null ? item.Categoria.Nombre : "")
+                </td>
+
+                <td>
+                    @(item.Lugar != null ? item.Lugar.Nombre : "")
+                </td>
+
+                <td>
+                    @(item.Estado == 1 ? "Activo" : "Inactivo")
+                </td>
+
+                <td>
+
+                    @Html.ActionLink("Detalles", "Details", new { id = item.ConciertoId }, new { @class = "btn btn-info btn-sm" })
+
+                    @Html.Raw(" ")
+
+                    @Html.ActionLink("Editar", "Edit", new { id = item.ConciertoId }, new { @class = "btn btn-warning btn-sm" })
+
+                    @Html.Raw(" ")
+
+                    @Html.ActionLink("Eliminar", "Delete", new { id = item.ConciertoId }, new { @class = "btn btn-danger btn-sm" })
+
+                </td>
+
+            </tr>
+        }
+
+    </tbody>
+
+</table>

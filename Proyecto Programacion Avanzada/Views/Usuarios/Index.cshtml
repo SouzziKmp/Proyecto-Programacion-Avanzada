@@ -1,0 +1,90 @@
+﻿@model IEnumerable<Proyecto.Data.Entities.ApplicationUser>
+
+@{
+    ViewBag.Title = "Usuarios";
+}
+
+<h2>Administración de usuarios</h2>
+
+<p>
+    @Html.ActionLink(
+        "Crear usuario",
+        "Create",
+        null,
+        new { @class = "btn btn-primary" }
+    )
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Cédula</th>
+            <th>Teléfono</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var usuario in Model)
+        {
+            <tr>
+                <td>
+                    @usuario.Nombre @usuario.Apellidos
+                </td>
+
+                <td>
+                    @usuario.Email
+                </td>
+
+                <td>
+                    @usuario.Cedula
+                </td>
+
+                <td>
+                    @usuario.Telefono
+                </td>
+
+                <td>
+                    @if (usuario.Activo)
+                    {
+                        <span class="badge bg-success">
+                            Activo
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">
+                            Inactivo
+                        </span>
+                    }
+                </td>
+
+                <td>
+                    @Html.ActionLink(
+                        "Detalles",
+                        "Details",
+                        new { id = usuario.Id },
+                        new { @class = "btn btn-info btn-sm" }
+                    )
+
+                    @Html.ActionLink(
+                        "Editar",
+                        "Edit",
+                        new { id = usuario.Id },
+                        new { @class = "btn btn-warning btn-sm" }
+                    )
+
+                    @Html.ActionLink(
+                        "Desactivar",
+                        "Delete",
+                        new { id = usuario.Id },
+                        new { @class = "btn btn-danger btn-sm" }
+                    )
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

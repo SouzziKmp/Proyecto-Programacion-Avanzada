@@ -1,0 +1,63 @@
+﻿@model Proyecto.Data.Entities.Concierto
+
+@{
+    ViewBag.Title = "Detalle del Concierto";
+}
+
+<h2>Detalle del Concierto</h2>
+
+<div>
+
+    <hr />
+    <div class="text-center" style="margin-bottom:25px;">
+
+        @foreach (var imagen in Model.Imagenes.OrderBy(i => i.Orden))
+        {
+            <img src="@Url.Action("Concierto", "Imagen",
+                    new { id = Model.ConciertoId, orden = imagen.Orden })"
+                 style="max-width:400px;
+                    max-height:300px;
+                    margin:10px;
+                    border-radius:8px;
+                    border:1px solid #ccc;" />
+        }
+
+    </div>
+    <dl class="dl-horizontal">
+
+        <dt>Título</dt>
+        <dd>@Model.Titulo</dd>
+
+        <dt>Descripción</dt>
+        <dd>@Model.Descripcion</dd>
+
+        <dt>Fecha del Evento</dt>
+        <dd>@Model.FechaEvento.ToString("dd/MM/yyyy HH:mm")</dd>
+
+        <dt>Categoría</dt>
+        <dd>@(Model.Categoria != null ? Model.Categoria.Nombre : "")</dd>
+
+        <dt>Lugar</dt>
+        <dd>@(Model.Lugar != null ? Model.Lugar.Nombre : "")</dd>
+
+        <dt>Estado</dt>
+        <dd>@(Model.Estado == 1 ? "Activo" : "Inactivo")</dd>
+
+        <dt>Fecha de Creación</dt>
+        <dd>@Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</dd>
+
+    </dl>
+
+</div>
+
+<p>
+
+    @Html.ActionLink("Editar", "Edit",
+        new { id = Model.ConciertoId },
+        new { @class = "btn btn-warning" })
+
+    @Html.ActionLink("Volver", "Index",
+        null,
+        new { @class = "btn btn-primary" })
+
+</p>

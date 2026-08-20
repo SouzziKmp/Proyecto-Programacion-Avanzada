@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
+using Microsoft.Owin.Security;
 using Proyecto.Data.Entities;
 using Proyecto_Programacion_Avanzada.Models;
 
@@ -21,6 +22,7 @@ namespace Proyecto_Programacion_Avanzada.Controllers
         public ApplicationUserManager UserManager =>
             _userManager ?? (_userManager = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>());
 
+        private IAuthenticationManager AuthenticationManager => HttpContext.GetOwinContext().Authentication;
 
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
@@ -34,20 +36,15 @@ namespace Proyecto_Programacion_Avanzada.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+                return View(model);
 
-            var result = await SignInManager.PasswordSignInAsync(
-                model.Email, model.Password, model.RememberMe, shouldLockout: true);
+            var resultado = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: true);
 
-            switch (result)
+            switch (resultado)
             {
                 case SignInStatus.Success:
-                    var usuario = await UserManager.FindByEmailAsync(model.Email);
-                    if (usuario != null)
-                    {
-                        usuario.UltimoLogin = DateTime.Now;
-                        await UserManager.UpdateAsync(usuario);
-                    }
+                    await ActualizarUltimoLoginAsync(model.Email);
                     return RedirectToLocal(returnUrl);
 
                 case SignInStatus.LockedOut:
@@ -58,6 +55,15 @@ namespace Proyecto_Programacion_Avanzada.Controllers
                     ModelState.AddModelError("", "Correo o contrasena incorrectos.");
                     return View(model);
             }
+        }
+
+        private async Task ActualizarUltimoLoginAsync(string email)
+        {
+            var usuario = await UserManager.FindByEmailAsync(email);
+            if (usuario == null) return;
+
+            usuario.UltimoLogin = DateTime.Now;
+            await UserManager.UpdateAsync(usuario);
         }
 
         [AllowAnonymous]
@@ -71,12 +77,14 @@ namespace Proyecto_Programacion_Avanzada.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+                return View(model);
 
             var usuario = new ApplicationUser
             {
                 UserName = model.Email,
                 Email = model.Email,
+                EmailConfirmed = true,
                 Nombre = model.Nombre,
                 Apellidos = model.Apellidos,
                 Cedula = model.Cedula,
@@ -85,38 +93,50 @@ namespace Proyecto_Programacion_Avanzada.Controllers
                 Activo = true
             };
 
-            var result = await UserManager.CreateAsync(usuario, model.Password);
-            if (result.Succeeded)
+            var resultado = await UserManager.CreateAsync(usuario, model.Password);
+            if (resultado.Succeeded)
             {
                 await UserManager.AddToRoleAsync(usuario.Id, "Asociado"); // <- aqui se asigna el rol
                 await SignInManager.SignInAsync(usuario, isPersistent: false, rememberBrowser: false);
+
                 return RedirectToAction("Index", "Home");
             }
 
-            foreach (var error in result.Errors) ModelState.AddModelError("", error);
+            foreach (var error in resultado.Errors)
+                ModelState.AddModelError("", error);
+
             return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult LogOff()
+        public ActionResult Logout()
         {
-            HttpContext.GetOwinContext().Authentication.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+            AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
             return RedirectToAction("Index", "Home");
         }
 
         [AllowAnonymous]
-        public ActionResult AccessDenied() => View();
+        public ActionResult AccessDenied()
+        {
+            return View();
+        }
 
         private ActionResult RedirectToLocal(string returnUrl)
         {
-            if (Url.IsLocalUrl(returnUrl)) return Redirect(returnUrl);
+            if (Url.IsLocalUrl(returnUrl))
+                return Redirect(returnUrl);
+
             return RedirectToAction("Index", "Home");
         }
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing) { _userManager?.Dispose(); _signInManager?.Dispose(); }
+            if (disposing)
+            {
+                _userManager?.Dispose();
+                _signInManager?.Dispose();
+            }
             base.Dispose(disposing);
         }
     }

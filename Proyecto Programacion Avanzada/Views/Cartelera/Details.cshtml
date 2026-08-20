@@ -35,11 +35,12 @@
         <hr />
 
         <h4>Entradas disponibles</h4>
+        <div id="carrito-mensaje" class="alert d-none"></div>
 
         @if (!Model.TiposEntrada.Any())
         {
             <div class="alert alert-warning">
-                
+
             </div>
         }
         else
@@ -61,31 +62,23 @@
                             <td>₡@tipo.Precio.ToString("N2")</td>
                             <td>@tipo.Disponibles</td>
                             <td>
-                                @if (tipo.Disponibles > 0)
+                                if (tipo.Disponibles > 0)
                                 {
-                                    using (Html.BeginForm("Agregar", "Carrito", FormMethod.Post))
-                                    {
-                                        @Html.AntiForgeryToken()
+                                <div class="input-group input-group-sm">
+                                    <input type="number"
+                                           id="cantidad-@tipo.TipoEntradaId"
+                                           value="1"
+                                           min="1"
+                                           max="@tipo.Disponibles"
+                                           class="form-control" />
 
-                                        @Html.Hidden("tipoEntradaId", tipo.TipoEntradaId)
-
-                                        <div class="input-group input-group-sm">
-                                            <input type="number"
-                                                   name="cantidad"
-                                                   value="1"
-                                                   min="1"
-                                                   max="@tipo.Disponibles"
-                                                   class="form-control" />
-
-                                            <button type="submit" class="btn btn-primary">
-                                                Agregar
-                                            </button>
-                                        </div>
-                                    }
+                                    <button type="button"
+                                            class="btn btn-primary"
+                                            onclick="agregarEntrada(@tipo.TipoEntradaId)">
+                                        Agregar
+                                    </button>
+                                </div>
                                 }
-                                else
-                                {
-                                    <span class="badge bg-danger">Agotado</span>
                                 }
                             </td>
                         </tr>
@@ -94,10 +87,47 @@
             </table>
 
             <div class="alert alert-info">
-               
+
             </div>
         }
 
         @Html.ActionLink("Volver a cartelera", "Index", "Cartelera", null, new { @class = "btn btn-outline-secondary" })
     </div>
 </div>
+@section scripts {
+    <script>
+        function agregarEntrada(tipoEntradaId) {
+            var cantidad = parseInt(document.getElementById("cantidad-" + tipoEntradaId).value, 10);
+
+            fetch("/api/entradas/agregar", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ TipoEntradaId: tipoEntradaId, Cantidad: cantidad })
+            })
+                .then(function (respuesta) {
+                    return respuesta.json().then(function (datos) {
+                        return { ok: respuesta.ok, datos: datos };
+                    });
+                })
+                .then(function (resultado) {
+                    var caja = document.getElementById("carrito-mensaje");
+                    caja.classList.remove("d-none", "alert-success", "alert-danger");
+
+                    if (resultado.ok) {
+                        caja.classList.add("alert-success");
+                        caja.textContent = resultado.datos.mensaje || "Entrada agregada al carrito.";
+                    } else {
+                        caja.classList.add("alert-danger");
+                        caja.textContent = resultado.datos || "No se pudo agregar la entrada.";
+                    }
+                })
+                .catch(function () {
+                    var caja = document.getElementById("carrito-mensaje");
+                    caja.classList.remove("d-none");
+                    caja.classList.add("alert-danger");
+                    caja.textContent = "Ocurrió un error al conectar con el servidor.";
+                });
+        }
+    </script>
+}

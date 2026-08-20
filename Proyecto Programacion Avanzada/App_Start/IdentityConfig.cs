@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
@@ -28,11 +28,11 @@ namespace Proyecto_Programacion_Avanzada
                 RequireUniqueEmail = true
             };
 
-            // Reglas de contrasena: minimo 6 caracteres, con mayuscula, minuscula y numero
+            // Reglas de contrasena: minimo 6 caracteres, con mayuscula, minuscula, numero y caracter especial
             manager.PasswordValidator = new PasswordValidator
             {
                 RequiredLength = 6,
-                RequireNonLetterOrDigit = false,
+                RequireNonLetterOrDigit = true,
                 RequireDigit = true,
                 RequireLowercase = true,
                 RequireUppercase = true
@@ -49,6 +49,8 @@ namespace Proyecto_Programacion_Avanzada
                 manager.UserTokenProvider =
                     new DataProtectorTokenProvider<ApplicationUser>(dataProtectionProvider.Create("ASP.NET Identity"));
             }
+
+            manager.EmailService = new NullEmailService();
 
             return manager;
         }
@@ -91,6 +93,17 @@ namespace Proyecto_Programacion_Avanzada
         {
             var userIdentity = await manager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
             return userIdentity;
+        }
+    }
+
+    public class NullEmailService : IIdentityMessageService
+    {
+        public System.Threading.Tasks.Task SendAsync(
+            IdentityMessage message)
+        {
+            // Para el proyecto académico no se requiere
+            // envío real de correo.
+            return System.Threading.Tasks.Task.CompletedTask;
         }
     }
 }
