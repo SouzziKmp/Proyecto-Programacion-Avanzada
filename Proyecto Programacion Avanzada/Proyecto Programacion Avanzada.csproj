@@ -288,6 +288,7 @@
     <Content Include="Views\conciertos\Details.cshtml" />
     <Content Include="Views\conciertos\Edit.cshtml" />
     <Content Include="Views\conciertos\Index.cshtml" />
+    <Content Include="Views\Account\AccessDenied.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Usuarios\Index.cshtml" />

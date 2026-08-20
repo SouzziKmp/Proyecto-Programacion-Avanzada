@@ -26,7 +26,26 @@ namespace Proyecto_Programacion_Avanzada
                 {
                     OnValidateIdentity = SecurityStampValidator.OnValidateIdentity<ApplicationUserManager, ApplicationUser>(
                         validateInterval: TimeSpan.FromMinutes(30),
-                        regenerateIdentity: (manager, user) => user.GenerateUserIdentityAsync(manager))
+                        regenerateIdentity: (manager, user) => user.GenerateUserIdentityAsync(manager)),
+                    OnApplyRedirect = ctx =>
+                    {
+                        // Las llamadas a la Web API deben recibir 401/403 planos, no un
+                        // redirect HTML, para que el fetch() del cliente los detecte bien.
+                        if (ctx.Request.Path.StartsWithSegments(new PathString("/api")))
+                            return;
+
+                        // Si ya inicio sesion pero le falta el rol (ej. Administrador
+                        // intentando comprar), lo manda a AccessDenied en vez del login.
+                        var usuario = ctx.OwinContext.Authentication.User;
+                        if (usuario != null && usuario.Identity.IsAuthenticated)
+                        {
+                            ctx.Response.Redirect("/Account/AccessDenied");
+                        }
+                        else
+                        {
+                            ctx.Response.Redirect(ctx.RedirectUri);
+                        }
+                    }
                 },
                 ExpireTimeSpan = TimeSpan.FromMinutes(60),
                 SlidingExpiration = true

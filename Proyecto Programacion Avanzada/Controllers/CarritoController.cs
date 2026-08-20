@@ -5,7 +5,7 @@ using Proyecto.Service;
 
 namespace Proyecto_Programacion_Avanzada.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Asociado")]
     public class CarritoController : Controller
     {
         private readonly ICarritoService _carritoService;

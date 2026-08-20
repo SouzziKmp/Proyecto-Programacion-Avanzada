@@ -62,7 +62,11 @@
                             <td>₡@tipo.Precio.ToString("N2")</td>
                             <td>@tipo.Disponibles</td>
                             <td>
-                                @if (tipo.Disponibles > 0)
+                                @if (User.IsInRole("Administrador"))
+                                {
+                                    <span class="text-muted">No disponible para administradores</span>
+                                }
+                                else if (tipo.Disponibles > 0)
                                 {
                                     <div class="input-group input-group-sm">
                                         <input type="number"

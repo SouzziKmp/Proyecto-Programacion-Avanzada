@@ -6,7 +6,7 @@ using Proyecto_Programacion_Avanzada.Models.Api;
 
 namespace Proyecto_Programacion_Avanzada.Controllers.Api
 {
-    [Authorize]
+    [Authorize(Roles = "Asociado")]
     [RoutePrefix("api/entradas")]
     public class EntradasApiController : ApiController
     {

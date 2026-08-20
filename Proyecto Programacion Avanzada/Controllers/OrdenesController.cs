@@ -5,7 +5,7 @@ using Proyecto.Service;
 
 namespace Proyecto_Programacion_Avanzada.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Asociado")]
     public class OrdenesController : Controller
     {
         private readonly IOrdenService _ordenService;
