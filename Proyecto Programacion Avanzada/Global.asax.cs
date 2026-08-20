@@ -1,11 +1,11 @@
+using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 
 namespace Proyecto_Programacion_Avanzada
 {
-    public class MvcApplication :
-        System.Web.HttpApplication
+    public class MvcApplication : System.Web.HttpApplication
     {
         protected void Application_Start()
         {
@@ -13,17 +13,13 @@ namespace Proyecto_Programacion_Avanzada
 
             UnityConfig.RegisterComponents();
 
-            FilterConfig.RegisterGlobalFilters(
-                GlobalFilters.Filters
-            );
+            GlobalConfiguration.Configure(WebApiConfig.Register);
 
-            RouteConfig.RegisterRoutes(
-                RouteTable.Routes
-            );
+            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
 
-            BundleConfig.RegisterBundles(
-                BundleTable.Bundles
-            );
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
+
+            BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
     }
 }

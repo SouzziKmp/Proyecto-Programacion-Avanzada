@@ -1,0 +1,66 @@
+﻿@{
+    ViewBag.Title = "Panel de administración";
+}
+
+<h2 class="mb-4">Panel de administración</h2>
+
+<div id="dashboard-error" class="alert alert-danger d-none"></div>
+
+<div class="row g-3">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h6 class="card-title">Conciertos</h6>
+                <p class="card-text fs-3" id="totalConciertos">--</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h6 class="card-title">Ingresos (₡)</h6>
+                <p class="card-text fs-3" id="totalIngresos">--</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h6 class="card-title">Entradas vendidas</h6>
+                <p class="card-text fs-3" id="totalEntradas">--</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h6 class="card-title">Reseñas pendientes</h6>
+                <p class="card-text fs-3" id="resenasPendientes">--</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("/api/dashboard", { method: "GET", credentials: "same-origin" })
+                .then(function (respuesta) {
+                    if (!respuesta.ok) throw new Error("No se pudo cargar el dashboard.");
+                    return respuesta.json();
+                })
+                .then(function (datos) {
+                    document.getElementById("totalConciertos").textContent = datos.TotalConciertos;
+                    document.getElementById("totalIngresos").textContent =
+                        datos.TotalIngresos.toLocaleString("es-CR", { minimumFractionDigits: 2 });
+                    document.getElementById("totalEntradas").textContent = datos.TotalEntradasVendidas;
+                    document.getElementById("resenasPendientes").textContent = datos.ResenasPendientes;
+                })
+                .catch(function (error) {
+                    var caja = document.getElementById("dashboard-error");
+                    caja.textContent = error.message;
+                    caja.classList.remove("d-none");
+                });
+        });
+    </script>
+}
