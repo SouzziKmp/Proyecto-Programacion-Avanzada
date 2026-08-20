@@ -1,16 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Linq;
 using System.Web.Mvc;
+using Proyecto.Service;
 
 namespace Proyecto_Programacion_Avanzada.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly ICarteleraService _carteleraService;
+
+        public HomeController(ICarteleraService carteleraService)
+        {
+            _carteleraService = carteleraService;
+        }
+
         public ActionResult Index()
         {
-            return View();
+            var proximosConciertos = _carteleraService.ObtenerCartelera()
+                .OrderBy(c => c.FechaEvento)
+                .Take(3);
+
+            return View(proximosConciertos);
         }
 
         public ActionResult About()

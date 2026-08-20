@@ -1,33 +1,71 @@
-﻿@{
-    ViewBag.Title = "Home Page";
+﻿@model IEnumerable<Proyecto.Data.Entities.Concierto>
+
+@{
+    ViewBag.Title = "Inicio";
 }
 
-<main>
-    <section class="row" aria-labelledby="aspnetTitle">
-        <h1 id="title">ASP.NET</h1>
-        <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-        <p><a href="https://asp.net" class="btn btn-primary btn-md">Learn more &raquo;</a></p>
-    </section>
+<div class="p-5 mb-4 bg-dark text-white rounded">
+    <h1 class="display-5 fw-bold">FideTickets</h1>
+    <p class="lead">
+        Compra tus entradas para los mejores conciertos, talleres y charlas.
+        Encuentra el evento, elige tu tipo de entrada y asegura tu lugar.
+    </p>
+    @Html.ActionLink("Ver cartelera", "Index", "Cartelera", null, new { @class = "btn btn-primary btn-lg" })
+</div>
 
-    <div class="row">
-        <section class="col-md-4" aria-labelledby="gettingStartedTitle">
-            <h2 id="gettingStartedTitle">Getting started</h2>
-            <p>
-                ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-                enables a clean separation of concerns and gives you full control over markup
-                for enjoyable, agile development.
-            </p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-        </section>
-        <section class="col-md-4" aria-labelledby="librariesTitle">
-            <h2 id="librariesTitle">Get more libraries</h2>
-            <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-        </section>
-        <section class="col-md-4" aria-labelledby="hostingTitle">
-            <h2 id="hostingTitle">Web Hosting</h2>
-            <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-        </section>
+<h2 class="mb-4">Próximos eventos</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        Todavía no hay eventos publicados.
     </div>
-</main>
+}
+else
+{
+    <div class="row g-4 mb-4">
+        @foreach (var concierto in Model)
+        {
+            var precioDesde = concierto.TiposEntrada.Any()
+                ? concierto.TiposEntrada.Min(t => t.Precio)
+                : 0;
+
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <img src="@Url.Action("Imagen", "Cartelera", new { id = concierto.ConciertoId })"
+                         class="card-img-top"
+                         alt="@concierto.Titulo"
+                         style="height: 220px; object-fit: cover;" />
+
+                    <div class="card-body">
+                        <h5 class="card-title">@concierto.Titulo</h5>
+
+                        <p class="card-text text-muted mb-1">
+                            @concierto.FechaEvento.ToString("dd/MM/yyyy hh:mm tt")
+                        </p>
+
+                        <p class="card-text mb-1">
+                            @concierto.Lugar.Nombre
+                        </p>
+
+                        <p class="card-text">
+                            <strong>Desde:</strong> ₡@precioDesde.ToString("N2")
+                        </p>
+                    </div>
+
+                    <div class="card-footer bg-white">
+                        @Html.ActionLink(
+                            "Ver detalle",
+                            "Details",
+                            "Cartelera",
+                            new { id = concierto.ConciertoId },
+                            new { @class = "btn btn-primary w-100" }
+                        )
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <p>@Html.ActionLink("Ver toda la cartelera »", "Index", "Cartelera")</p>
+}

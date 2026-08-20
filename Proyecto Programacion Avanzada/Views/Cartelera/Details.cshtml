@@ -62,23 +62,22 @@
                             <td>₡@tipo.Precio.ToString("N2")</td>
                             <td>@tipo.Disponibles</td>
                             <td>
-                                if (tipo.Disponibles > 0)
+                                @if (tipo.Disponibles > 0)
                                 {
-                                <div class="input-group input-group-sm">
-                                    <input type="number"
-                                           id="cantidad-@tipo.TipoEntradaId"
-                                           value="1"
-                                           min="1"
-                                           max="@tipo.Disponibles"
-                                           class="form-control" />
+                                    <div class="input-group input-group-sm">
+                                        <input type="number"
+                                               id="cantidad-@tipo.TipoEntradaId"
+                                               value="1"
+                                               min="1"
+                                               max="@tipo.Disponibles"
+                                               class="form-control" />
 
-                                    <button type="button"
-                                            class="btn btn-primary"
-                                            onclick="agregarEntrada(@tipo.TipoEntradaId)">
-                                        Agregar
-                                    </button>
-                                </div>
-                                }
+                                        <button type="button"
+                                                class="btn btn-primary"
+                                                onclick="agregarEntrada(@tipo.TipoEntradaId)">
+                                            Agregar
+                                        </button>
+                                    </div>
                                 }
                             </td>
                         </tr>
