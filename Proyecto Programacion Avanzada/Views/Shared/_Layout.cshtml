@@ -72,8 +72,28 @@
                                     new { @class = "nav-link" }
                                 )
                             </li>
+
+                            <li class="nav-item">
+                                @Html.ActionLink(
+                                    "Dashboard",
+                                    "Dashboard",
+                                    "Admin",
+                                    null,
+                                    new { @class = "nav-link" }
+                                )
+                            </li>
+
+                            <li class="nav-item">
+                                @Html.ActionLink(
+                                    "Moderación",
+                                    "Moderacion",
+                                    "Admin",
+                                    null,
+                                    new { @class = "nav-link" }
+                                )
+                            </li>
                         }
-                    }
+                    }hboard
 
                 </ul>
                 @if (Request.IsAuthenticated)

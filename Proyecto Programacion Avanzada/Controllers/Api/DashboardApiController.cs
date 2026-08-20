@@ -29,6 +29,33 @@ namespace Proyecto_Programacion_Avanzada.Controllers.Api
 
             var ordenesPagadas = ordenes.Where(o => o.Estado == 2);
 
+            var ingresosPorMes = ordenesPagadas
+                .GroupBy(o => new { o.FechaOrden.Year, o.FechaOrden.Month })
+                .Select(g => new
+                {
+                    g.Key.Year,
+                    g.Key.Month,
+                    Total = g.Sum(o => o.Total)
+                })
+                .ToList()
+                .OrderBy(x => x.Year)
+                .ThenBy(x => x.Month)
+                .Select(x => new PuntoDashboardDto
+                {
+                    Etiqueta = x.Month.ToString("00") + "/" + x.Year,
+                    Valor = x.Total
+                })
+                .ToList();
+
+            var conciertosPorCategoria = conciertos
+                .GroupBy(c => c.Categoria.Nombre)
+                .Select(g => new PuntoDashboardDto
+                {
+                    Etiqueta = g.Key,
+                    Valor = g.Count()
+                })
+                .ToList();
+
             var dto = new DashboardDto
             {
                 TotalConciertos = conciertos.Count(),
@@ -39,7 +66,9 @@ namespace Proyecto_Programacion_Avanzada.Controllers.Api
                     .Where(d => d.Orden.Estado == 2)
                     .Sum(d => (int?)d.Cantidad) ?? 0,
                 ResenasPendientes = resenas.Count(r => r.Estado == 0),
-                UsuariosRegistrados = usuarios.Count()
+                UsuariosRegistrados = usuarios.Count(),
+                IngresosPorMes = ingresosPorMes,
+                ConciertosPorCategoria = conciertosPorCategoria
             };
 
             return Ok(dto);

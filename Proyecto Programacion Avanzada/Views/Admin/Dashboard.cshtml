@@ -4,63 +4,220 @@
 
 <h2 class="mb-4">Panel de administración</h2>
 
-<div id="dashboard-error" class="alert alert-danger d-none"></div>
+<div id="dashboard-spinner" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2">Cargando información del dashboard...</p>
+</div>
 
-<div class="row g-3">
-    <div class="col-md-3">
-        <div class="card text-white bg-primary">
-            <div class="card-body">
-                <h6 class="card-title">Conciertos</h6>
-                <p class="card-text fs-3" id="totalConciertos">--</p>
+<div id="dashboard-contenido" class="d-none">
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h6 class="card-title">Conciertos</h6>
+                    <p class="card-text fs-3" id="totalConciertos">--</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h6 class="card-title">Ingresos</h6>
+                    <p class="card-text fs-3" id="totalIngresos">--</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h6 class="card-title">Entradas vendidas</h6>
+                    <p class="card-text fs-3" id="totalEntradas">--</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h6 class="card-title">Reseñas pendientes</h6>
+                    <p class="card-text fs-3" id="resenasPendientes">--</p>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card text-white bg-success">
-            <div class="card-body">
-                <h6 class="card-title">Ingresos (₡)</h6>
-                <p class="card-text fs-3" id="totalIngresos">--</p>
+
+    <button type="button"
+            class="btn btn-outline-primary mb-4"
+            data-bs-toggle="modal"
+            data-bs-target="#dashboardModal">
+        Ver resumen completo
+    </button>
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <h5>Ingresos por mes</h5>
+            <div id="graficoIngresos"></div>
+        </div>
+
+        <div class="col-md-6">
+            <h5>Conciertos por categoría</h5>
+            <div id="graficoCategorias"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="dashboardModal" tabindex="-1" aria-labelledby="dashboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="dashboardModalLabel" class="modal-title">Resumen administrativo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Conciertos activos</span>
+                        <strong id="modalConciertosActivos">--</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Órdenes pagadas</span>
+                        <strong id="modalOrdenesPagadas">--</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Usuarios registrados</span>
+                        <strong id="modalUsuarios">--</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Total de ingresos</span>
+                        <strong id="modalIngresos">--</strong>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cerrar
+                </button>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card text-white bg-info">
-            <div class="card-body">
-                <h6 class="card-title">Entradas vendidas</h6>
-                <p class="card-text fs-3" id="totalEntradas">--</p>
-            </div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="dashboardToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div id="dashboardToastHeader" class="toast-header">
+            <strong class="me-auto" id="dashboardToastTitulo">Dashboard</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Cerrar"></button>
         </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-white bg-warning">
-            <div class="card-body">
-                <h6 class="card-title">Reseñas pendientes</h6>
-                <p class="card-text fs-3" id="resenasPendientes">--</p>
-            </div>
+        <div class="toast-body" id="dashboardToastMensaje">
+            Mensaje del dashboard.
         </div>
     </div>
 </div>
 
 @section scripts {
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            fetch("/api/dashboard", { method: "GET", credentials: "same-origin" })
+        function formatearColones(valor) {
+            return valor.toLocaleString("es-CR", {
+                style: "currency",
+                currency: "CRC"
+            });
+        }
+
+        function mostrarToast(titulo, mensaje, esError) {
+            var toast = document.getElementById("dashboardToast");
+            var encabezado = document.getElementById("dashboardToastHeader");
+
+            document.getElementById("dashboardToastTitulo").textContent = titulo;
+            document.getElementById("dashboardToastMensaje").textContent = mensaje;
+
+            encabezado.classList.remove("bg-success", "bg-danger", "text-white");
+            encabezado.classList.add(esError ? "bg-danger" : "bg-success", "text-white");
+
+            bootstrap.Toast.getOrCreateInstance(toast).show();
+        }
+
+        function pintarGrafico(contenedorId, datos, esMoneda) {
+            var contenedor = document.getElementById(contenedorId);
+            contenedor.innerHTML = "";
+
+            if (!datos || datos.length === 0) {
+                contenedor.innerHTML = "<div class='alert alert-info'>No hay datos para mostrar.</div>";
+                return;
+            }
+
+            var maximo = Math.max.apply(null, datos.map(function (item) {
+                return item.Valor;
+            }));
+
+            datos.forEach(function (item) {
+                var porcentaje = maximo === 0 ? 0 : (item.Valor / maximo) * 100;
+                var textoValor = esMoneda ? formatearColones(item.Valor) : item.Valor;
+
+                var bloque = document.createElement("div");
+                bloque.className = "mb-3";
+
+                bloque.innerHTML =
+                    "<div class='d-flex justify-content-between mb-1'>" +
+                    "<span>" + item.Etiqueta + "</span>" +
+                    "<strong>" + textoValor + "</strong>" +
+                    "</div>" +
+                    "<div class='progress' role='progressbar' aria-valuenow='" + porcentaje.toFixed(0) + "' aria-valuemin='0' aria-valuemax='100'>" +
+                    "<div class='progress-bar' style='width: " + porcentaje.toFixed(0) + "%'></div>" +
+                    "</div>";
+
+                contenedor.appendChild(bloque);
+            });
+        }
+
+        function cargarDashboard() {
+            var spinner = document.getElementById("dashboard-spinner");
+            var contenido = document.getElementById("dashboard-contenido");
+
+            spinner.classList.remove("d-none");
+            contenido.classList.add("d-none");
+
+            fetch("/api/dashboard", {
+                method: "GET",
+                credentials: "same-origin"
+            })
                 .then(function (respuesta) {
-                    if (!respuesta.ok) throw new Error("No se pudo cargar el dashboard.");
+                    if (!respuesta.ok) {
+                        throw new Error("No se pudo cargar la información del dashboard.");
+                    }
+
                     return respuesta.json();
                 })
                 .then(function (datos) {
                     document.getElementById("totalConciertos").textContent = datos.TotalConciertos;
-                    document.getElementById("totalIngresos").textContent =
-                        datos.TotalIngresos.toLocaleString("es-CR", { minimumFractionDigits: 2 });
+                    document.getElementById("totalIngresos").textContent = formatearColones(datos.TotalIngresos);
                     document.getElementById("totalEntradas").textContent = datos.TotalEntradasVendidas;
                     document.getElementById("resenasPendientes").textContent = datos.ResenasPendientes;
+
+                    document.getElementById("modalConciertosActivos").textContent = datos.TotalConciertosActivos;
+                    document.getElementById("modalOrdenesPagadas").textContent = datos.TotalOrdenesPagadas;
+                    document.getElementById("modalUsuarios").textContent = datos.UsuariosRegistrados;
+                    document.getElementById("modalIngresos").textContent = formatearColones(datos.TotalIngresos);
+
+                    pintarGrafico("graficoIngresos", datos.IngresosPorMes, true);
+                    pintarGrafico("graficoCategorias", datos.ConciertosPorCategoria, false);
+
+                    contenido.classList.remove("d-none");
+                    mostrarToast("Dashboard cargado", "La información se cargó correctamente.", false);
                 })
                 .catch(function (error) {
-                    var caja = document.getElementById("dashboard-error");
-                    caja.textContent = error.message;
-                    caja.classList.remove("d-none");
+                    mostrarToast("Error", error.message, true);
+                })
+                .finally(function () {
+                    spinner.classList.add("d-none");
                 });
-        });
+        }
+
+        document.addEventListener("DOMContentLoaded", cargarDashboard);
     </script>
 }
