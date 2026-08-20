@@ -9,6 +9,11 @@ namespace Proyecto.Data.Entities
     {
         public int ConciertoId { get; set; }
 
+        // Codigo de negocio del evento (rubrica Proyecto Final 3.1), distinto del
+        // ConciertoId interno. Se genera automaticamente al crear el evento.
+        [Required, MaxLength(20)]
+        public string Codigo { get; set; }
+
         [Required, MaxLength(150)]
         public string Titulo { get; set; }
 

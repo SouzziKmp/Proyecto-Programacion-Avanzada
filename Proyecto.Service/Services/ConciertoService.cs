@@ -32,6 +32,8 @@ namespace Proyecto.Service.Services
             Concierto concierto,
             List<ConciertoImagen> imagenes)
         {
+            concierto.Codigo = "EVT-" + DateTime.Now.ToString("yyyyMMddHHmmss");
+
             _unitOfWork.Repository<Concierto>().Add(concierto);
             _unitOfWork.SaveChanges();
 

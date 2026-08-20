@@ -73,6 +73,14 @@ namespace Proyecto.Data
                 .HasColumnAnnotation(IndexAnnotation.AnnotationName,
                     new IndexAnnotation(new IndexAttribute("IX_Categoria_Nombre") { IsUnique = true }));
 
+            modelBuilder.Entity<Concierto>().Property(c => c.Codigo)
+                .HasColumnAnnotation(IndexAnnotation.AnnotationName,
+                    new IndexAnnotation(new IndexAttribute("IX_Concierto_Codigo") { IsUnique = true }));
+
+            modelBuilder.Entity<ApplicationUser>().Property(u => u.Codigo)
+                .HasColumnAnnotation(IndexAnnotation.AnnotationName,
+                    new IndexAnnotation(new IndexAttribute("IX_AspNetUsers_Codigo") { IsUnique = true }));
+
             modelBuilder.Entity<Ticket>().Property(t => t.CodigoUnico)
                 .HasColumnAnnotation(IndexAnnotation.AnnotationName,
                     new IndexAnnotation(new IndexAttribute("IX_Ticket_CodigoUnico") { IsUnique = true }));

@@ -82,6 +82,7 @@ namespace Proyecto_Programacion_Avanzada.Controllers
 
             var usuario = new ApplicationUser
             {
+                Codigo = "USR-" + DateTime.Now.ToString("yyyyMMddHHmmss"),
                 UserName = model.Email,
                 Email = model.Email,
                 EmailConfirmed = true,

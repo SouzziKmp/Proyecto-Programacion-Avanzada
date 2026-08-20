@@ -18,6 +18,7 @@
 <table class="table table-striped">
     <thead>
         <tr>
+            <th>Código</th>
             <th>Nombre</th>
             <th>Correo</th>
             <th>Cédula</th>
@@ -31,6 +32,10 @@
         @foreach (var usuario in Model)
         {
             <tr>
+                <td>
+                    @usuario.Codigo
+                </td>
+
                 <td>
                     @usuario.Nombre @usuario.Apellidos
                 </td>

@@ -1,4 +1,5 @@
 ﻿using System.Web.Http;
+using Proyecto_Programacion_Avanzada.Filters;
 
 namespace Proyecto_Programacion_Avanzada
 {
@@ -6,6 +7,8 @@ namespace Proyecto_Programacion_Avanzada
     {
         public static void Register(HttpConfiguration config)
         {
+            config.Filters.Add(new ApiExceptionFilterAttribute());
+
             config.MapHttpAttributeRoutes();
 
             config.Routes.MapHttpRoute(

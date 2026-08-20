@@ -11,6 +11,11 @@ namespace Proyecto.Data.Entities
     // Hereda Id, UserName, Email, PasswordHash, SecurityStamp, Roles, etc. de ASP.NET Identity (RNF-03).
     public class ApplicationUser : IdentityUser
     {
+        // Codigo de negocio del usuario (rubrica Proyecto Final 3.2), distinto del
+        // Id (GUID) de ASP.NET Identity. Se genera automaticamente al registrarse.
+        [Required, MaxLength(20)]
+        public string Codigo { get; set; }
+
         [Required, MaxLength(80)]
         public string Nombre { get; set; }
 

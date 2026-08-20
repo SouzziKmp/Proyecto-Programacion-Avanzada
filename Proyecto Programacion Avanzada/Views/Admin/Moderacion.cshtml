@@ -20,8 +20,31 @@
     <tbody id="cuerpo-resenas"></tbody>
 </table>
 
+<div class="modal fade" id="confirmarModeracionModal" tabindex="-1" aria-labelledby="confirmarModeracionLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="confirmarModeracionLabel" class="modal-title">Confirmar acción</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <p id="confirmarModeracionMensaje">¿Confirmas esta acción?</p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="confirmarModeracionBoton" class="btn btn-primary">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section scripts {
     <script>
+        var confirmarModeracionModal;
+        var accionPendiente = null;
+
         function cargarResenas() {
             fetch("/api/resenas/pendientes", { method: "GET", credentials: "same-origin" })
                 .then(function (respuesta) {
@@ -56,9 +79,23 @@
                         tdComentario.textContent = r.Comentario;
 
                         var tdAcciones = document.createElement("td");
-                        tdAcciones.innerHTML =
-                            "<button class=\"btn btn-success btn-sm me-1\" onclick=\"moderar(" + r.ResenaId + ", true)\">Aprobar</button>" +
-                            "<button class=\"btn btn-danger btn-sm\" onclick=\"moderar(" + r.ResenaId + ", false)\">Rechazar</button>";
+
+                        var btnAprobar = document.createElement("button");
+                        btnAprobar.className = "btn btn-success btn-sm me-1";
+                        btnAprobar.textContent = "Aprobar";
+                        btnAprobar.onclick = function () {
+                            pedirConfirmacion(r.ResenaId, true, r.Comentario);
+                        };
+
+                        var btnRechazar = document.createElement("button");
+                        btnRechazar.className = "btn btn-danger btn-sm";
+                        btnRechazar.textContent = "Rechazar";
+                        btnRechazar.onclick = function () {
+                            pedirConfirmacion(r.ResenaId, false, r.Comentario);
+                        };
+
+                        tdAcciones.appendChild(btnAprobar);
+                        tdAcciones.appendChild(btnRechazar);
 
                         fila.appendChild(tdConcierto);
                         fila.appendChild(tdUsuario);
@@ -74,6 +111,20 @@
                     caja.textContent = error.message;
                     caja.classList.remove("d-none");
                 });
+        }
+
+        function pedirConfirmacion(id, aprobar, comentario) {
+            accionPendiente = { id: id, aprobar: aprobar };
+
+            var verbo = aprobar ? "aprobar" : "rechazar";
+            document.getElementById("confirmarModeracionMensaje").textContent =
+                "¿Seguro que deseas " + verbo + " esta reseña? \"" + comentario + "\"";
+
+            var boton = document.getElementById("confirmarModeracionBoton");
+            boton.className = "btn btn-sm " + (aprobar ? "btn-success" : "btn-danger");
+            boton.textContent = aprobar ? "Sí, aprobar" : "Sí, rechazar";
+
+            confirmarModeracionModal.show();
         }
 
         function moderar(id, aprobar) {
@@ -95,6 +146,18 @@
                 });
         }
 
-        document.addEventListener("DOMContentLoaded", cargarResenas);
+        document.addEventListener("DOMContentLoaded", function () {
+            confirmarModeracionModal = new bootstrap.Modal(document.getElementById("confirmarModeracionModal"));
+
+            document.getElementById("confirmarModeracionBoton").addEventListener("click", function () {
+                if (accionPendiente) {
+                    moderar(accionPendiente.id, accionPendiente.aprobar);
+                    accionPendiente = null;
+                }
+                confirmarModeracionModal.hide();
+            });
+
+            cargarResenas();
+        });
     </script>
 }

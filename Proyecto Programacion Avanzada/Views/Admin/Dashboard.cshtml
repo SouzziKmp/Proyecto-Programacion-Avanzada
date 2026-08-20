@@ -57,7 +57,7 @@
         Ver resumen completo
     </button>
 
-    <div class="row g-4">
+    <div class="row g-4 mb-4">
         <div class="col-md-6">
             <h5>Ingresos por mes</h5>
             <div id="graficoIngresos"></div>
@@ -66,6 +66,13 @@
         <div class="col-md-6">
             <h5>Conciertos por categoría</h5>
             <div id="graficoCategorias"></div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <h5>Eventos con bajo aforo (próximos a agotarse)</h5>
+            <div id="listaBajoAforo"></div>
         </div>
     </div>
 </div>
@@ -85,12 +92,24 @@
                         <strong id="modalConciertosActivos">--</strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between">
+                        <span>Conciertos próximos</span>
+                        <strong id="modalConciertosProximos">--</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
                         <span>Órdenes pagadas</span>
                         <strong id="modalOrdenesPagadas">--</strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between">
                         <span>Usuarios registrados</span>
                         <strong id="modalUsuarios">--</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Usuarios activos</span>
+                        <strong id="modalUsuariosActivos">--</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Usuarios inactivos</span>
+                        <strong id="modalUsuariosInactivos">--</strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between">
                         <span>Total de ingresos</span>
@@ -175,6 +194,32 @@
             });
         }
 
+        function pintarBajoAforo(eventos) {
+            var contenedor = document.getElementById("listaBajoAforo");
+            contenedor.innerHTML = "";
+
+            if (!eventos || eventos.length === 0) {
+                contenedor.innerHTML = "<div class='alert alert-success'>Ningún evento próximo está por agotarse.</div>";
+                return;
+            }
+
+            var lista = document.createElement("ul");
+            lista.className = "list-group";
+
+            eventos.forEach(function (evento) {
+                var item = document.createElement("li");
+                item.className = "list-group-item d-flex justify-content-between align-items-center";
+                item.innerHTML =
+                    "<span>" + evento.Titulo + "</span>" +
+                    "<span class='badge bg-danger'>" +
+                    evento.Disponibles + " / " + evento.Aforo +
+                    " disponibles (" + evento.PorcentajeDisponible + "%)</span>";
+                lista.appendChild(item);
+            });
+
+            contenedor.appendChild(lista);
+        }
+
         function cargarDashboard() {
             var spinner = document.getElementById("dashboard-spinner");
             var contenido = document.getElementById("dashboard-contenido");
@@ -200,12 +245,16 @@
                     document.getElementById("resenasPendientes").textContent = datos.ResenasPendientes;
 
                     document.getElementById("modalConciertosActivos").textContent = datos.TotalConciertosActivos;
+                    document.getElementById("modalConciertosProximos").textContent = datos.TotalConciertosProximos;
                     document.getElementById("modalOrdenesPagadas").textContent = datos.TotalOrdenesPagadas;
                     document.getElementById("modalUsuarios").textContent = datos.UsuariosRegistrados;
+                    document.getElementById("modalUsuariosActivos").textContent = datos.UsuariosActivos;
+                    document.getElementById("modalUsuariosInactivos").textContent = datos.UsuariosInactivos;
                     document.getElementById("modalIngresos").textContent = formatearColones(datos.TotalIngresos);
 
                     pintarGrafico("graficoIngresos", datos.IngresosPorMes, true);
                     pintarGrafico("graficoCategorias", datos.ConciertosPorCategoria, false);
+                    pintarBajoAforo(datos.EventosBajoAforo);
 
                     contenido.classList.remove("d-none");
                     mostrarToast("Dashboard cargado", "La información se cargó correctamente.", false);

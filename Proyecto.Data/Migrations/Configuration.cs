@@ -36,6 +36,7 @@ namespace Proyecto.Data.Migrations
             {
                 admin = new ApplicationUser
                 {
+                    Codigo = "USR-" + DateTime.Now.ToString("yyyyMMddHHmmss"),
                     UserName = "admin@proyectofinal.com",
                     Email = "admin@proyectofinal.com",
                     EmailConfirmed = true,
@@ -57,6 +58,7 @@ namespace Proyecto.Data.Migrations
             {
                 socio = new ApplicationUser
                 {
+                    Codigo = "USR-" + DateTime.Now.ToString("yyyyMMddHHmmss"),
                     UserName = "socio@proyectofinal.com",
                     Email = "socio@proyectofinal.com",
                     EmailConfirmed = true,
@@ -185,6 +187,7 @@ namespace Proyecto.Data.Migrations
             {
                 concierto = new Concierto
                 {
+                    Codigo = "EVT-" + DateTime.Now.ToString("yyyyMMddHHmmss"),
                     Titulo = titulo,
                     Descripcion = descripcion,
                     FechaEvento = fechaEvento,

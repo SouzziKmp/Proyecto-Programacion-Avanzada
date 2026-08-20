@@ -2,3 +2,5 @@
 bin/
 obj/
 packages/
+# Log de errores generado en runtime por los filtros de excepciones
+App_Data/errores.log

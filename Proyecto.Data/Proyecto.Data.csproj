@@ -26,6 +26,12 @@
     <EmbeddedResource Update="Migrations\202607290326438_InitialCreate.resx">
       <LogicalName>Proyecto.Data.Migrations.InitialCreate.resources</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Update="Migrations\202607310005373_EditarImagenes.resx">
+      <LogicalName>Proyecto.Data.Migrations.EditarImagenes.resources</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Migrations\202608200706029_AgregarCodigos.resx">
+      <LogicalName>Proyecto.Data.Migrations.AgregarCodigos.resources</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

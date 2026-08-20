@@ -80,6 +80,9 @@ namespace Proyecto_Programacion_Avanzada.Controllers
             Concierto concierto,
             IEnumerable<HttpPostedFileBase> archivos)
         {
+            // El codigo lo genera el servicio, no viene en el formulario.
+            ModelState.Remove(nameof(Concierto.Codigo));
+
             if (ModelState.IsValid)
             {
                 var listaImagenes = new List<ConciertoImagen>();
